@@ -1,0 +1,15 @@
+# bloat
+.venv/
+.venv
+venv
+env
+.vscode/
+.idea/
+.claude/
+temp/
+
+# python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
