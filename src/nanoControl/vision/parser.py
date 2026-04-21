@@ -1,45 +1,54 @@
 from paddleocr import PaddleOCR
 import numpy as np
-import json
 
-# init OCR
-ocr_engine = PaddleOCR(use_angle_cls=True, lang='en')
+# Single global engine — PaddleOCR is expensive to initialise
+_ocr_engine = PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
 
-def get_ui_map(image: any) -> list[dict]:
+MIN_CONFIDENCE = 0.5
+
+
+def get_ui_map(image, min_conf: float = MIN_CONFIDENCE) -> list[dict]:
     """
-    Map out elements from taken screenshot a list of text 
-    elements with cordiantes for the respective element
+    Extract visible text elements from a screenshot.
 
-    - param: image (screenshot)
-    - return: element and screen positions
+    Returns a list of dicts sorted in reading order (top-to-bottom,
+    left-to-right), each with:
+      text  — the detected string
+      pos   — [x, y] pixel centre of the bounding box
+      box   — [x1, y1, x2, y2] tight bounding rect (for spatial reasoning)
+      conf  — OCR confidence 0–1
     """
-    
     img_array = np.array(image)
-    ocr_result = ocr_engine.ocr(img_array)
-    ui_elements = []
+    ocr_result = _ocr_engine.ocr(img_array)
 
-    temp_dump_dir = "C:/Users/bilguun.odbayar/Documents/GitHub/NanoControl/src/nanocontrol/temp"
-    with open(temp_dump_dir + "/recent_ocr_dump.txt", "a") as f:
-        f.write(str(ocr_result))
+    elements = []
 
-    if ocr_result and ocr_result[0]:
-        for detection in ocr_result[0]:
-            corners = detection[0] # detected within this "box"
+    if not ocr_result or not ocr_result[0]:
+        return elements
 
-            text_info = detection[1] 
-            text = text_info[0] # strip the actual text content
-            confidence = text_info[1] # detection confidence
+    for detection in ocr_result[0]:
+        corners = detection[0]
+        text, confidence = detection[1]
 
-            center_x = int(sum(p[0] for p in corners) / 4)
-            center_y = int(sum(p[1] for p in corners) / 4)
+        if confidence < min_conf:
+            continue
 
-            ui_elements.append({
-                "text": text,
-                "pos": [center_x, center_y],
-                "conf": round(float(confidence), 2)
-            })
+        xs = [p[0] for p in corners]
+        ys = [p[1] for p in corners]
 
-    with open(temp_dump_dir + "/recent_ocr_dump.json", "a") as f:
-        f.write(json.dumps(ui_elements, indent=2))
+        x1, y1 = int(min(xs)), int(min(ys))
+        x2, y2 = int(max(xs)), int(max(ys))
+        cx = (x1 + x2) // 2
+        cy = (y1 + y2) // 2
 
-    return ui_elements
+        elements.append({
+            "text": text,
+            "pos": [cx, cy],
+            "box": [x1, y1, x2, y2],
+            "conf": round(float(confidence), 2),
+        })
+
+    # Reading order: row bands of ~20px height, then left-to-right within each band
+    elements.sort(key=lambda e: (e["pos"][1] // 20, e["pos"][0]))
+
+    return elements

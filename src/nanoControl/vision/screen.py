@@ -1,17 +1,17 @@
 import pyautogui
-import os
 from PIL import Image
 
-def capture_screen() -> Image.Image:
-    """
-    Capture a screenshot of the screen.
-    Also saves ss to /temp for debugging
 
-    - param: none
+def capture_screen(save_path: str | None = None) -> Image.Image:
+    """
+    Capture a full screenshot.
+
+    - param save_path: optional file path to persist the image for debugging
     - return: PIL image
     """
+    screenshot = pyautogui.screenshot()
 
-    temp_dump_dir = "C:/Users/bilguun.odbayar/Documents/GitHub/NanoControl/src/nanocontrol/temp"
-    screenshot = pyautogui.screenshot(temp_dump_dir + "/temp_ss.png")
-    
+    if save_path:
+        screenshot.save(save_path)
+
     return screenshot
