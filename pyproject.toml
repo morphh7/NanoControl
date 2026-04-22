@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nanocontrol"
+version = "0.1.0"
+description = "NanoControl - vision-driven desktop automation"
+readme = "README.md"
+requires-python = ">=3.9,<3.14"
+license = { file = "LICENSE" }
+dependencies = [
+    "paddleocr>=3.0,<4",
+    "pyautogui>=0.9.54",
+    "pillow>=10.0",
+    "numpy>=1.26,<3",
+    "Flask",
+    "anthropic",
+    "pyautogui",
+    "flask", 
+    "flask-cors",
+    "python-dotenv",
+    "pydantic",
+]
+
+# Note: paddlepaddle / paddlepaddle-gpu is intentionally NOT listed here.
+# It must come from the correct index URL (CPU vs CUDA), which
+# `bootstrap_env.py` handles automatically at environment bootstrap time.
+
+[tool.setuptools.packages.find]
+where = ["src"]

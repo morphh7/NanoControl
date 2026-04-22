@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>NanoControl Panel</title>
+        <link rel="stylesheet" href="style/main.css">
+    </head>
+
+    <body>
+        <section class="page">
+            <div class="layout">
+                <div class="container">
+                    <div class="header-wrapper">
+                        <h1 id="title">nanocontrol</h1>
+                        <h1 id="alt-title">panel</h1>
+                    </div>
+                  
+                    <div class="transcript" id="transcript">
+                        <div class="empty" id="empty">how can i help you?</div>
+                    </div>
+                  
+                    <div class="input-group">
+                        <input type="text" id="promptInput" placeholder="e.g. reply to my emails, summarize notes..." autocomplete="off">
+                        <button id="runBtn">execute</button>
+                    </div>
+                </div>
+              
+                <aside class="telemetry">
+                    <div class="tel-section">
+                        <span class="tel-label">elapsed</span>
+                        <span class="tel-value" id="elapsed">0.00s</span>
+                    </div>
+                    <div class="tel-divider"></div>
+                    <div class="tel-section">
+                        <span class="tel-label">chars</span>
+                        <span class="tel-value dim" id="chars">0</span>
+                    </div>
+                    <div class="tel-section">
+                        <span class="tel-label">tokens (est.)</span>
+                        <span class="tel-value dim" id="tokens">0</span>
+                    </div>
+                    <div class="tel-section">
+                        <span class="tel-label">cost (est.)</span>
+                        <span class="tel-value dim" id="cost">$0.0000</span>
+                    </div>
+                    <div class="tel-divider"></div>
+                    <div class="tel-section">
+                        <span class="tel-label">steps</span>
+                        <div class="steps" id="steps">
+                            <div class="step" data-step="0"><span class="dot"></span><span>idle</span></div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </body>
+    <script type="module" src="script/main.js"></script>
+</html>

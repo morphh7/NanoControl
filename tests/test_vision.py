@@ -1,24 +1,37 @@
-from src.nanocontrol.vision.screen import *
-from src.nanocontrol.vision.parser import *
-import src.nanocontrol.utils as utils
-import json
 import time
+from PIL import Image
+import json
 
-timer = utils.timer()
+from src import utils
+from src.vision.parser import parser_engine
+from src.vision.screen import screen_capture
 
-timer.start()
-img = screen_capture().capture_screen()
-# ui_data = parser_engine(debug=False).get_screen_string_map(img)
+def run_debug(engine: object, img: Image, loop_times: int = 10) -> None:
+    time_list: list[str] = []
+    
+    for i in range(loop_times):
+        t = time.perf_counter()
+        engine.get_raw_screen_data(img)
+        time_list.append(f"Run {i + 1}: {(time.perf_counter() - t) * 1000:.0f}ms")
 
-# print(json.dumps(ui_data, indent=2))
-# print(f"[*] Time to parse screen: {round(timer.stop(), 2)}s")
+    for line in time_list:
+        print(line)
 
-time_list = []
+def main(debug: bool = False, loop: bool = False) -> None:
+    timer = utils.timer()
 
-for i in range(10):
-    t = time.perf_counter()
-    parser_engine(debug=False).get_screen_string_map(img)
-    time_list.append(f"Run {i}: {(time.perf_counter()-t)*1000:.0f}ms")
+    timer.start()
+    img = screen_capture().capture_screen()
+    print(f"[*] Screen captured in {timer.stop() * 1000:.0f}ms")
 
-for i in range(len(time_list)):
-    print(time_list[i])
+    engine = parser_engine(debug=debug)
+
+    if loop: 
+        run_debug(engine, img)
+        return
+
+    parsed_raw_data = engine.get_raw_screen_data(img)
+    print(json.dumps(parsed_raw_data, indent=1))
+
+if __name__ == "__main__":
+    main(debug=True, loop=False)
